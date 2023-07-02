@@ -1,0 +1,19 @@
+﻿<Window x:Class="FileCopyAppDomain.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileCopyAppDomain"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="700">
+    <Grid>
+        <StackPanel Orientation="Horizontal" >
+            <Label Height='40' Width="60" FontSize="20" >From</Label>
+            <TextBox Height='40' Width="390" Margin="15"></TextBox>
+            <Button></Button>
+            
+            <Label Height='40' Width="60" FontSize="20" >To</Label>
+        </StackPanel>
+        
+    </Grid>
+</Window>
