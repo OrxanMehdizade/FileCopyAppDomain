@@ -5,15 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileCopyAppDomain"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="700">
+        Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <StackPanel Orientation="Horizontal" >
-            <Label Height='40' Width="60" FontSize="20" >From</Label>
-            <TextBox Height='40' Width="390" Margin="15"></TextBox>
-            <Button></Button>
-            
-            <Label Height='40' Width="60" FontSize="20" >To</Label>
-        </StackPanel>
-        
+        <Label Height='40' Width="60" FontSize="20" Margin="77,66,613,278">From</Label>
+        <TextBox x:Name="destinationTextBox" Height='40' Width="390" Margin="168,148,192,196"></TextBox>
+
+        <Button x:Name="openDestinationButton" Height='40' Width="100" Margin="578,123,62,171" Click="OpenDestinationButton_Click">Open</Button>
+        <Label Height='40' Width="60" FontSize="20" Margin="77,148,613,196">To</Label>
+        <TextBox x:Name="sourceTextBox" Height='40' Width="390" Margin="168,65,192,279"></TextBox>
+        <Button x:Name="openSourceButton" Height='40' Width="100" Margin="578,37,62,257" Click="OpenSourceButton_Click">Open</Button>
+
+        <Button x:Name="suspendButton" Height='40' Width="90" Margin="240,288,420,56" Click="SuspendButton_Click">Suspend</Button>
+        <Button x:Name="resumeButton" Height='40' Width="90" Margin="400,288,260,56" Click="ResumeButton_Click">Resume</Button>
+        <Button x:Name="startButton" Height='40' Width="90" Margin="546,288,114,56" Click="StartButton_Click">Start</Button>
+        <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="40" Margin="102,244,0,0" VerticalAlignment="Top" Width="601"/>
+
     </Grid>
 </Window>
