@@ -9,121 +9,114 @@ namespace FileCopyAppDomain
 {
     public partial class MainWindow : Window
     {
-        private bool Suspend;
-        private string SourcePath;
-        private string DestinationPath;
-        private BackgroundWorker CopyWorker;
-        private long totalBytesdownloading;
-
+        private bool suspendCopy;
+        private string sourceFilePath;
+        private string destinationFilePath;
+        private BackgroundWorker copyWorker;
+        private long totalBytesCopied;
 
         public MainWindow()
         {
             InitializeComponent();
-            Suspend = false;
-            CopyWorker = new BackgroundWorker();
-            CopyWorker.WorkerReportsProgress = true;
-            CopyWorker.DoWork+=CopyWorkerDowork;
-            CopyWorker.ProgressChanged += CopyWorkerProgressChanged;
-            CopyWorker.RunWorkerCompleted += CopyWorkerRunWorkerCompleted;
+            suspendCopy = false;
+            copyWorker = new BackgroundWorker();
+            copyWorker.WorkerReportsProgress = true;
+            copyWorker.DoWork += CopyWorker_DoWork;
+            copyWorker.ProgressChanged += CopyWorker_ProgressChanged;
+            copyWorker.RunWorkerCompleted += CopyWorker_RunWorkerCompleted;
         }
-        private void CopyWorkerDowork(object sender,DoWorkEventArgs e)
+
+        private void CopyWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            using (var sourceStream = new FileStream(SourcePath,
-                FileMode.Open,FileAccess.Read))
+            using (var sourceStream = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read))
             {
-                using(var destinationStream= new FileStream(DestinationPath,
-                    FileMode.Create, FileAccess.Write))
+                using (var destinationStream = new FileStream(destinationFilePath, FileMode.Create, FileAccess.Write))
                 {
-                    var byt = new byte[1];
-                    int bytRead;
-                    totalBytesdownloading = 0;
-                    int copytime = 200;
-                    while((bytRead=sourceStream.Read(byt,0,byt.Length))>0) 
+                    var buffer = new byte[1];
+                    int bytesRead;
+                    int copyDelay = 100; 
+                    sourceStream.Seek(totalBytesCopied, SeekOrigin.Begin);
+
+                    while ((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-
-                        if (Suspend)
+                        if (suspendCopy)
                         {
-                            while (Suspend)
-                            {
-                                Thread.Sleep(200);
-                            }
-                            if (totalBytesdownloading >= sourceStream.Length)
-                            {
-                                return;
-                            }
+                            e.Cancel = true;
+                            return;
                         }
-                        destinationStream.Write(byt, 0, bytRead);
-                        totalBytesdownloading+= bytRead;
 
-                        CopyWorker.ReportProgress((int)(totalBytesdownloading 
-                            * 100 / sourceStream.Length));
-                        Thread.Sleep(copytime);
+                        destinationStream.Write(buffer, 0, bytesRead);
+                        totalBytesCopied += bytesRead;
+                        copyWorker.ReportProgress((int)(totalBytesCopied * 100 / sourceStream.Length));
+                        Thread.Sleep(copyDelay);
                     }
                 }
-
             }
-
         }
 
-        private void CopyWorkerProgressChanged(object sender,ProgressChangedEventArgs e)
+        private void CopyWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressBar.Value = e.ProgressPercentage;
         }
 
-        private void CopyWorkerRunWorkerCompleted(object sender,RunWorkerCompletedEventArgs e)
+        private void CopyWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if(e.Cancelled) 
+            if (e.Cancelled)
             {
-                MessageBox.Show("Köçürmə əməliyyatı dayandırıldı");
+                MessageBox.Show("Köçürmə əməliyyatı dayandırıldı.");
             }
-            else if (e.Error!= null) 
+            else if (e.Error != null)
             {
-                MessageBox.Show("Köçürmə əməliyyatı zamanı xəta oldu-> "+ e.Error.Message);
+                MessageBox.Show("Köçürmə əməliyyatı zamanı xəta oldu-> " + e.Error.Message);
             }
             else
             {
-                MessageBox.Show("Köçürmə əməliyyatı başa çatı");
+                MessageBox.Show("Köçürmə əməliyyatı başa çatı.");
             }
         }
 
-        private void OpenSourceButton_Click(object sender, RoutedEventArgs e) 
+        private void OpenSourceButton_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
-                SourcePath = openFileDialog.FileName;
-                sourceTextBox.Text = SourcePath;
+                sourceFilePath = openFileDialog.FileName;
+                sourceTextBox.Text = sourceFilePath;
             }
         }
+
         private void OpenDestinationButton_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-            if(saveFileDialog.ShowDialog() == true)
+            if (saveFileDialog.ShowDialog() == true)
             {
-                DestinationPath = saveFileDialog.FileName;
-                destinationTextBox.Text = DestinationPath;
+                destinationFilePath = saveFileDialog.FileName;
+                destinationTextBox.Text = destinationFilePath;
             }
         }
+
         private void SuspendButton_Click(object sender, RoutedEventArgs e)
         {
-            Suspend=true;
+            suspendCopy = true;
         }
+
         private void ResumeButton_Click(object sender, RoutedEventArgs e)
         {
-            Suspend =false;
+            suspendCopy = false;
+            copyWorker.RunWorkerAsync(); 
         }
+
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            if(string.IsNullOrEmpty(SourcePath) || string.IsNullOrEmpty(DestinationPath))
+            if (string.IsNullOrEmpty(sourceFilePath) || string.IsNullOrEmpty(destinationFilePath))
             {
-                MessageBox.Show("Mənbə və məlumat faylı seç");
+                MessageBox.Show("Mənbə və məlumat faylı seç.");
                 return;
             }
+
             progressBar.Value = 0;
-            Suspend = false;
-            CopyWorker.RunWorkerAsync();
+            suspendCopy = false;
+            copyWorker.RunWorkerAsync();
         }
-
     }
-
 }
