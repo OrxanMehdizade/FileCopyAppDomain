@@ -85,11 +85,11 @@ namespace FileCopyAppDomain
         {
             if (e.Cancelled)
             {
-                MessageBox.Show("Köçürmə əməliyyatı dayandırıldı.");
+                MessageBox.Show("Kopyalama əməliyyatı dayandırıldı.");
             }
             else if (e.Error != null)
             {
-                MessageBox.Show("Köçürmə əməliyyatı zamanı xəta oldu-> " + e.Error.Message);
+                MessageBox.Show("Kopyalama əməliyyatı zamanı xəta oldu-> " + e.Error.Message);
             }
             else
             {
